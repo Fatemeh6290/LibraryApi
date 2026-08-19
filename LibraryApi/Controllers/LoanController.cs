@@ -1,5 +1,6 @@
 using LibraryApi.DTOs;
 using LibraryApi.Interfaces;
+using LibraryApi.Mapper;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,14 +22,7 @@ public class LoanController : ControllerBase
     {
         var loans = _loanService.GetLoans();
 
-        var result = loans.Select(loan => new LoanDto()
-        {
-            LoanId = loan.LoanId,
-            BookId = loan.BookId,
-            MemberId = loan.MemberId,
-            LoanDate = loan.LoanDate,
-            ReturnDate = loan.ReturnDate
-        }).ToList();
+        var result = loans.Select(LoanMapper.ToDto).ToList();
 
         return result;
     }
@@ -41,14 +35,7 @@ public class LoanController : ControllerBase
         if (loan == null)
             return NotFound();
         
-        var result = new LoanDto
-        {
-            LoanId = loan.LoanId,
-            BookId = loan.BookId,
-            MemberId = loan.MemberId,
-            LoanDate = loan.LoanDate,
-            ReturnDate = loan.ReturnDate
-        };
+        var result = LoanMapper.ToDto(loan);
         
         return result;
     }
@@ -65,7 +52,7 @@ public class LoanController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Loan> AddLoan(CreateLoanDto dto)
+    public ActionResult<LoanDto> AddLoan(CreateLoanDto dto)
     {
         var loan = _loanService.AddLoan(
             dto.BookId,
@@ -74,14 +61,7 @@ public class LoanController : ControllerBase
         if (loan is null)
             return BadRequest("Member or Book does not exist, or the book is not available.");
 
-        var result = new LoanDto
-        {
-            LoanId = loan.LoanId,
-            BookId = loan.BookId,
-            MemberId = loan.MemberId,
-            LoanDate = loan.LoanDate,
-            ReturnDate = loan.ReturnDate
-        };
+        var result = LoanMapper.ToDto(loan);
         
         return CreatedAtAction(nameof(GetLoanById),
             new{id = loan.LoanId},

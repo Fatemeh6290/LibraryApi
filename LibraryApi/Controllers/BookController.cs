@@ -1,5 +1,6 @@
 using LibraryApi.DTOs;
 using LibraryApi.Interfaces;
+using LibraryApi.Mapper;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,14 +22,7 @@ public class BookController : ControllerBase
     {
         var books = _bookService.GetBooks();
         
-        var result = books.Select(book => new BookDto
-        {
-            BookId = book.BookId,
-            Author = book.Author,
-            Title = book.Title,
-            IsAvailable = book.IsAvailable,
-            PublishedYear = book.PublishedYear,
-        }).ToList();
+        var result = books.Select(BookMapper.ToDto).ToList();
 
         return result;
     }
@@ -41,14 +35,7 @@ public class BookController : ControllerBase
         if (book == null)
             return NotFound();
 
-        var result = new BookDto
-        {
-            BookId = book.BookId,
-            Author = book.Author,
-            Title = book.Title,
-            IsAvailable = book.IsAvailable,
-            PublishedYear = book.PublishedYear
-        };
+        var result = BookMapper.ToDto(book);
 
         return result;
     }
@@ -65,7 +52,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Book> AddBook(CreateBookDto dto)
+    public ActionResult<BookDto> AddBook(CreateBookDto dto)
     {
         var book = _bookService.AddBook(
             dto.Title,
@@ -74,15 +61,8 @@ public class BookController : ControllerBase
         
         if (book is null)
             return BadRequest("A book with the same title already exists.");
-        
-        var result = new BookDto
-        {
-            BookId = book.BookId,
-            Author = book.Author,
-            Title = book.Title,
-            PublishedYear = book.PublishedYear,
-            IsAvailable = book.IsAvailable
-        };
+
+        var result = BookMapper.ToDto(book);
         
         return CreatedAtAction(
             nameof(GetBookById),

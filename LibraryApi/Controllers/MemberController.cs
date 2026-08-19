@@ -1,5 +1,6 @@
 using LibraryApi.DTOs;
 using LibraryApi.Interfaces;
+using LibraryApi.Mapper;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,12 +22,7 @@ public class MemberController : ControllerBase
     {
         var members = _memberService.GetMembers();
 
-        var result = members.Select(member => new MemberDto
-        {
-            MemberId = member.MemberId,
-            Name = member.Name,
-            Email = member.Email
-        }).ToList();
+        var result = members.Select(MemberMapper.ToDto).ToList();
         
         return result;
     }
@@ -39,12 +35,7 @@ public class MemberController : ControllerBase
         if (member == null)
             return NotFound();
 
-        var result = new MemberDto
-        {
-            MemberId = member.MemberId,
-            Name = member.Name,
-            Email = member.Email
-        };
+        var result = MemberMapper.ToDto(member);
         
         return result;
     }
@@ -61,7 +52,7 @@ public class MemberController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Member> AddMember(CreateMemberDto dto)
+    public ActionResult<MemberDto> AddMember(CreateMemberDto dto)
     {
         var member = _memberService.AddMember(
              dto.Name,
@@ -70,12 +61,7 @@ public class MemberController : ControllerBase
         if (member is null)
             return BadRequest("Member already exists.");
 
-        var result = new MemberDto
-        {
-            MemberId = member.MemberId,
-            Name = member.Name,
-            Email = member.Email
-        };
+        var result = MemberMapper.ToDto(member);
         
         return CreatedAtAction(nameof(GetMemberById), 
             new { id = member.MemberId }, 
