@@ -1,3 +1,4 @@
+using LibraryApi.DTOs;
 using LibraryApi.Interfaces;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -16,20 +17,40 @@ public class LoanController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Loan>> GetLoans()
+    public ActionResult<List<LoanDto>> GetLoans()
     {
-        return _loanService.GetLoans();
+        var loans = _loanService.GetLoans();
+
+        var result = loans.Select(loan => new LoanDto()
+        {
+            LoanId = loan.LoanId,
+            BookId = loan.BookId,
+            MemberId = loan.MemberId,
+            LoanDate = loan.LoanDate,
+            ReturnDate = loan.ReturnDate
+        }).ToList();
+
+        return result;
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Loan> GetLoan(int id)
+    public ActionResult<LoanDto> GetLoanById(int id)
     {
         var loan = _loanService.GetLoanById(id);
         
         if (loan == null)
             return NotFound();
         
-        return loan;
+        var result = new LoanDto
+        {
+            LoanId = loan.LoanId,
+            BookId = loan.BookId,
+            MemberId = loan.MemberId,
+            LoanDate = loan.LoanDate,
+            ReturnDate = loan.ReturnDate
+        };
+        
+        return result;
     }
 
     [HttpDelete("{id}")]
@@ -41,5 +62,18 @@ public class LoanController : ControllerBase
             return NotFound();
         
         return NoContent();
+    }
+
+    [HttpPost]
+    public IActionResult AddLoan(CreateLoanDto dto)
+    {
+        var result = _loanService.AddLoan(
+            dto.BookId,
+            dto.MemberId);
+        
+        if (!result)
+            return BadRequest("Member or Book does not exist, or the book is not available.");
+
+        return Ok();
     }
 }

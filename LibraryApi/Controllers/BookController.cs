@@ -1,3 +1,4 @@
+using LibraryApi.DTOs;
 using LibraryApi.Interfaces;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -16,20 +17,40 @@ public class BookController : ControllerBase
     }
     
     [HttpGet]
-    public ActionResult<List<Book>> GetBooks()
+    public ActionResult<List<BookDto>> GetBooks()
     {
-        return _bookService.GetBooks();
+        var books = _bookService.GetBooks();
+        
+        var result = books.Select(book => new BookDto
+        {
+            BookId = book.BookId,
+            Author = book.Author,
+            Title = book.Title,
+            IsAvailable = book.IsAvailable,
+            PublishedYear = book.PublishedYear,
+        }).ToList();
+
+        return result;
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Book> GetBookById(int id)
+    public ActionResult<BookDto> GetBookById(int id)
     {
         var book = _bookService.GetBookById(id);
         
         if (book == null)
             return NotFound();
 
-        return book;
+        var result = new BookDto
+        {
+            BookId = book.BookId,
+            Author = book.Author,
+            Title = book.Title,
+            IsAvailable = book.IsAvailable,
+            PublishedYear = book.PublishedYear
+        };
+
+        return result;
     }
 
     [HttpDelete("{id}")]
@@ -41,5 +62,19 @@ public class BookController : ControllerBase
             return NotFound();
         
         return NoContent();
+    }
+
+    [HttpPost]
+    public IActionResult AddBook(CreateBookDto dto)
+    {
+        var result = _bookService.AddBook(
+            dto.Title,
+            dto.Author,
+            dto.PublishedYear);
+        
+        if (!result)
+            return BadRequest("A book with the same title already exists.");
+        
+        return Ok();
     }
 }
