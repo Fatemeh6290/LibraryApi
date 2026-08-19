@@ -5,12 +5,12 @@ namespace LibraryApi.Services;
 
 public class LoanService : ILoanService
 {
-    private readonly MemberService _memberService;
-    private readonly BookService _bookService;
+    private readonly IMemberService _memberService;
+    private readonly IBookService _bookService;
     private readonly List<Loan> _loans = new();
     private int _loanId = 1;
 
-    public LoanService(MemberService memberService, BookService bookService)
+    public LoanService(IMemberService memberService, IBookService bookService)
     {
         _memberService = memberService;
         _bookService = bookService;
