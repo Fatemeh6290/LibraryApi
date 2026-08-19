@@ -16,23 +16,26 @@ public class LoanService : ILoanService
         _bookService = bookService;
     }
     
-    public bool AddLoan(int bookId, int memberId)
+    public Loan? AddLoan(int bookId, int memberId)
     {
         var book = _bookService.GetBookById(bookId);
         var member = _memberService.GetMemberById(memberId);
         if (member is null || book is null || book.IsAvailable == false)
-            return false;
+            return null;
         
-        _loans.Add(new Loan
+        var loan = new Loan
         {
             LoanId = _loanId++,
             BookId = bookId,
             MemberId = memberId,
             LoanDate = DateTime.Now,
             ReturnDate = null,
-        });
+        };
         book.IsAvailable = false;
-        return true;
+
+        _loans.Add(loan);
+        
+        return loan;
     }
 
     public bool ReturnBook(int id)

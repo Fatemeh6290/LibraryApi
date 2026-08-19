@@ -17,18 +17,20 @@ public class MemberService: IMemberService
         return _members.FirstOrDefault(x => x.MemberId == id);
     }
 
-    public bool AddMember(string name, string email)
+    public Member? AddMember(string name, string email)
     {
         if (_members.Any(x => x.Email == email))
-            return false;
+            return null;
         
-        _members.Add(new Member
+        var member = new Member
         {
             MemberId = _memberId++,
             Name = name,
             Email = email,
-        });
-        return true;
+        };
+        
+        _members.Add(member);
+        return member;
     }
 
     public bool DeleteMember(int id)

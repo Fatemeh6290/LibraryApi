@@ -18,20 +18,23 @@ public class BookService: IBookService
         return _books.FirstOrDefault(x => x.BookId == id);
     }
 
-    public bool AddBook(string title, string author, int publishedYear)
+    public Book? AddBook(string title, string author, int publishedYear)
     {
         if (_books.Any(x => x.Title == title))
-            return false;
+            return null;
         
-        _books.Add(new Book
+        var book = new Book
         {
             BookId = _bookId++,
             Title = title,
             Author = author,
             PublishedYear = publishedYear,
             IsAvailable = true
-        });
-        return true;
+        };
+        
+        _books.Add(book);
+        
+        return book;
     }
 
     public bool DeleteBook(int id)

@@ -61,15 +61,24 @@ public class MemberController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddMember(CreateMemberDto dto)
+    public ActionResult<Member> AddMember(CreateMemberDto dto)
     {
-        var result = _memberService.AddMember(
+        var member = _memberService.AddMember(
              dto.Name,
              dto.Email);
         
-        if (!result)
+        if (member is null)
             return BadRequest("Member already exists.");
 
-        return Ok();
+        var result = new MemberDto
+        {
+            MemberId = member.MemberId,
+            Name = member.Name,
+            Email = member.Email
+        };
+        
+        return CreatedAtAction(nameof(GetMemberById), 
+            new { id = member.MemberId }, 
+            result);
     }
 }

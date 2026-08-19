@@ -65,16 +65,28 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddBook(CreateBookDto dto)
+    public ActionResult<Book> AddBook(CreateBookDto dto)
     {
-        var result = _bookService.AddBook(
+        var book = _bookService.AddBook(
             dto.Title,
             dto.Author,
             dto.PublishedYear);
         
-        if (!result)
+        if (book is null)
             return BadRequest("A book with the same title already exists.");
         
-        return Ok();
+        var result = new BookDto
+        {
+            BookId = book.BookId,
+            Author = book.Author,
+            Title = book.Title,
+            PublishedYear = book.PublishedYear,
+            IsAvailable = book.IsAvailable
+        };
+        
+        return CreatedAtAction(
+            nameof(GetBookById),
+            new { id = book.BookId },
+            result);
     }
 }

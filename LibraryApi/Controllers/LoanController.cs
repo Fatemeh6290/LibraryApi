@@ -65,15 +65,26 @@ public class LoanController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddLoan(CreateLoanDto dto)
+    public ActionResult<Loan> AddLoan(CreateLoanDto dto)
     {
-        var result = _loanService.AddLoan(
+        var loan = _loanService.AddLoan(
             dto.BookId,
             dto.MemberId);
         
-        if (!result)
+        if (loan is null)
             return BadRequest("Member or Book does not exist, or the book is not available.");
 
-        return Ok();
+        var result = new LoanDto
+        {
+            LoanId = loan.LoanId,
+            BookId = loan.BookId,
+            MemberId = loan.MemberId,
+            LoanDate = loan.LoanDate,
+            ReturnDate = loan.ReturnDate
+        };
+        
+        return CreatedAtAction(nameof(GetLoanById),
+            new{id = loan.LoanId},
+            result);
     }
 }

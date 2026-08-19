@@ -6,6 +6,6 @@ public interface IMemberService
 {
     List<Member>? GetMembers();
     Member? GetMemberById(int id);
-    bool AddMember(string name, string email);
+    Member? AddMember(string name, string email);
     bool DeleteMember(int id);
 }
