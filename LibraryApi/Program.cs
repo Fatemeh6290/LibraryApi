@@ -1,3 +1,16 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using LibraryApi.Interfaces;
+using LibraryApi.Services;
 
-Console.WriteLine("Hello, World!");
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+builder.Services.AddSingleton<IBookService, BookService>();
+builder.Services.AddSingleton<IMemberService, MemberService>();
+builder.Services.AddSingleton<ILoanService, LoanService>();
+
+var app = builder.Build();
+
+app.MapControllers();
+
+app.Run();
