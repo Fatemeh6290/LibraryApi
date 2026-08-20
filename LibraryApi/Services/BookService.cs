@@ -1,3 +1,4 @@
+using LibraryApi.Data;
 using LibraryApi.Interfaces;
 using LibraryApi.Models;
 
@@ -5,28 +6,29 @@ namespace LibraryApi.Services;
 
 public class BookService: IBookService
 {
-    private readonly List<Book> _books = new();
+    private readonly LibraryDbContext _context;
     private readonly ILogger<BookService> _logger;
     private int _bookId = 1;
 
-    public BookService(ILogger<BookService> logger)
+    public BookService(LibraryDbContext context, ILogger<BookService> logger)
     {
+        _context = context;
         _logger = logger;
     }
     
     public List<Book> GetBooks()
     {
-        return _books.ToList();
+        return _context.Books.ToList();
     }
 
     public Book? GetBookById(int id)
     {
-        return _books.FirstOrDefault(x => x.BookId == id);
+        return _context.Books.FirstOrDefault(x => x.BookId == id);
     }
 
     public Book? AddBook(string title, string author, int publishedYear)
     {
-        if (_books.Any(x => x.Title == title))
+        if (_context.Books.Any(x => x.Title == title))
         {
             _logger.LogWarning("A book with the same title already exists.");
             return null;
@@ -41,7 +43,9 @@ public class BookService: IBookService
             IsAvailable = true
         };
         
-        _books.Add(book);
+        _context.Books.Add(book);
+        _context.SaveChanges();
+        
         _logger.LogInformation("Book with Id {BookId} added.", book.BookId);
         
         return book;
@@ -49,7 +53,7 @@ public class BookService: IBookService
 
     public bool DeleteBook(int id)
     {
-        var book = _books.FirstOrDefault(x => x.BookId == id);
+        var book = _context.Books.FirstOrDefault(x => x.BookId == id);
 
         if (book is null)
         {
@@ -57,7 +61,9 @@ public class BookService: IBookService
             return false;
         }
         
-        _books.Remove(book);
+        _context.Books.Remove(book);
+        _context.SaveChanges();
+        
         _logger.LogInformation("Book with Id {BookId} deleted.", book.BookId);
         
         return true;

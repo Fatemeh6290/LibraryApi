@@ -1,4 +1,6 @@
+using LibraryApi.Data;
 using LibraryApi.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LibraryApiTests;
@@ -9,9 +11,11 @@ public class LoanServiceTests
     public void AddLoan_ShouldAddLoan()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -30,10 +34,12 @@ public class LoanServiceTests
     public void AddLoan_ShouldReturnNull_WhenBookDoesNotExist()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance); 
-
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
+        
         //Act
         memberService.AddMember("Tim", "tim@gmail.com");
         var result = loanService.AddLoan(1, 1);
@@ -46,9 +52,11 @@ public class LoanServiceTests
     public void AddLoan_ShouldReturnNull_WhenMemberDoesNotExist()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -62,10 +70,12 @@ public class LoanServiceTests
     public void AddLoan_ShouldReturnNull_WhenBookIsNotAvailable()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
-
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
+        
         //Act
         bookService.AddBook("UML", "Peter", 2000);
         memberService.AddMember("Tim", "tim@gmail.com");
@@ -82,27 +92,31 @@ public class LoanServiceTests
     public void AddLoan_ShouldMakeBookUnavailable()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
-
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
+        
         //Act
         bookService.AddBook("UML", "Peter", 2000);
         memberService.AddMember("Tim", "tim@gmail.com");
         loanService.AddLoan(1, 1);
-        var book = bookService.GetBookById(1);
+        var result = bookService.GetBookById(1);
         
         //Assert
-        Assert.NotNull(book);
-        Assert.False(book.IsAvailable);
+        Assert.NotNull(result);
+        Assert.False(result.IsAvailable);
     }
     [Fact]
     public void ReturnBook_ShouldReturnBook()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -124,9 +138,11 @@ public class LoanServiceTests
     public void ReturnBook_ShouldReturnFalse_WhenLoanDoesNotExist()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         var result = loanService.ReturnBook(2);
@@ -138,9 +154,11 @@ public class LoanServiceTests
     public void ReturnBook_ShouldReturnFalse_WhenLoanAlreadyReturned()
     {
         //Arrange
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -155,9 +173,11 @@ public class LoanServiceTests
     [Fact]
     public void GetLoanById_ShouldReturnLoan()
     {
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -174,10 +194,12 @@ public class LoanServiceTests
     [Fact]
     public void GetLoanById_ShouldReturnNull_WhenLoanDoesNotExist()
     {
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
-
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
+        
         //Act
         bookService.AddBook("UML", "Peter", 2000);
         memberService.AddMember("Tim", "tim@gmail.com");
@@ -191,9 +213,11 @@ public class LoanServiceTests
     [Fact]
     public void GetLoans_ShouldReturnAllLoans()
     {
-        BookService bookService = new BookService(NullLogger<BookService>.Instance);
-        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
-        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookService = new BookService(context, NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(context, NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(context, memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);

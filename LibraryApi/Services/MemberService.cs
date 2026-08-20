@@ -1,3 +1,4 @@
+using LibraryApi.Data;
 using LibraryApi.Interfaces;
 using LibraryApi.Models;
 
@@ -5,27 +6,28 @@ namespace LibraryApi.Services;
 
 public class MemberService: IMemberService
 {
-    private readonly List<Member> _members = new();
+    private readonly LibraryDbContext _context;
     private readonly ILogger<MemberService> _logger;
     private int _memberId = 1;
 
-    public MemberService(ILogger<MemberService> logger)
+    public MemberService(LibraryDbContext context, ILogger<MemberService> logger)
     {
+        _context = context;
         _logger = logger;
     }
     public List<Member> GetMembers()
     {
-        return _members.ToList();
+        return _context.Members.ToList();
     }
 
     public Member? GetMemberById(int id)
     {
-        return _members.FirstOrDefault(x => x.MemberId == id);
+        return _context.Members.FirstOrDefault(x => x.MemberId == id);
     }
 
     public Member? AddMember(string name, string email)
     {
-        if (_members.Any(x => x.Email == email))
+        if (_context.Members.Any(x => x.Email == email))
         {
             _logger.LogWarning("A member with the Email {Email} already exists.", email);
             return null;
@@ -38,7 +40,9 @@ public class MemberService: IMemberService
             Email = email,
         };
         
-        _members.Add(member);
+        _context.Members.Add(member);
+        _context.SaveChanges();
+        
         _logger.LogInformation("Member with id {MemberId} added.", member.MemberId);
         
         return member;
@@ -46,7 +50,7 @@ public class MemberService: IMemberService
 
     public bool DeleteMember(int id)
     {
-        var member = _members.FirstOrDefault(x => x.MemberId == id);
+        var member = _context.Members.FirstOrDefault(x => x.MemberId == id);
 
         if (member is null)
         {
@@ -54,7 +58,9 @@ public class MemberService: IMemberService
             return false;
         }
         
-        _members.Remove(member);
+        _context.Members.Remove(member);
+        _context.SaveChanges();
+        
         _logger.LogInformation("Member with id {MemberId} deleted.", member.MemberId);
         
         return true;

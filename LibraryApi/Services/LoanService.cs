@@ -1,3 +1,4 @@
+using LibraryApi.Data;
 using LibraryApi.Interfaces;
 using LibraryApi.Models;
 
@@ -7,12 +8,13 @@ public class LoanService : ILoanService
 {
     private readonly IMemberService _memberService;
     private readonly IBookService _bookService;
-    private readonly List<Loan> _loans = new();
+    private readonly LibraryDbContext _context;
     private readonly ILogger<LoanService> _logger;
     private int _loanId = 1;
 
-    public LoanService(IMemberService memberService, IBookService bookService, ILogger<LoanService> logger)
+    public LoanService(LibraryDbContext context, IMemberService memberService, IBookService bookService, ILogger<LoanService> logger)
     {
+        _context = context;
         _memberService = memberService;
         _bookService = bookService;
         _logger = logger;
@@ -39,7 +41,9 @@ public class LoanService : ILoanService
         };
         book.IsAvailable = false;
 
-        _loans.Add(loan);
+        _context.Loans.Add(loan);
+        _context.SaveChanges();
+        
         _logger.LogInformation("The Loan with book id {BookId} and member id {MemberId} is added.", loan.BookId, loan.MemberId);
  
         return loan;
@@ -72,11 +76,11 @@ public class LoanService : ILoanService
 
     public List<Loan> GetLoans()
     {
-        return _loans.ToList();
+        return _context.Loans.ToList();
     }
 
     public Loan? GetLoanById(int id)
     {
-        return _loans.FirstOrDefault(l => l.LoanId == id);
+        return _context.Loans.FirstOrDefault(l => l.LoanId == id);
     }
 }

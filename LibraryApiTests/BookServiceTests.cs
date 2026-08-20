@@ -1,4 +1,6 @@
+using LibraryApi.Data;
 using LibraryApi.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LibraryApiTests;
@@ -9,7 +11,9 @@ public class BookServiceTests
     public void AddBook_ShouldAddBook()
     {
         //Arrange
-        BookService bookservice = new BookService(NullLogger<BookService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookservice = new BookService(context, NullLogger<BookService>.Instance);
         
         //Act
         bookservice.AddBook("Harry Potter", "Tom", 1997);
@@ -23,7 +27,9 @@ public class BookServiceTests
     public void AddBook_ShouldReturnFalse_WhenTitleAlreadyExists()
     {
         //Arrange
-        BookService bookservice = new BookService(NullLogger<BookService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookservice = new BookService(context, NullLogger<BookService>.Instance);
         
         //Act
         bookservice.AddBook("Harry Potter", "Tom", 1997);
@@ -36,7 +42,9 @@ public class BookServiceTests
     public void GetBooks_ShouldReturnAllBooks()
     {
         //Arrange
-        BookService bookservice = new BookService(NullLogger<BookService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookservice = new BookService(context, NullLogger<BookService>.Instance);
         
         //Act
         bookservice.AddBook("Harry Potter", "Tom", 1997); 
@@ -54,7 +62,9 @@ public class BookServiceTests
     public void GetBookById_ShouldReturnBook()
     {
         //Arrange
-        BookService bookservice = new BookService(NullLogger<BookService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookservice = new BookService(context, NullLogger<BookService>.Instance);
         
         //Act
         bookservice.AddBook("Harry Potter", "Tom", 1997); 
@@ -72,7 +82,9 @@ public class BookServiceTests
     public void GetBookById_ShouldReturnNull_WhenBookDoesNotExist()
     {
         //Arrange
-        BookService bookservice = new BookService(NullLogger<BookService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookservice = new BookService(context, NullLogger<BookService>.Instance);
         
         //Act
         bookservice.AddBook("Harry Potter", "Tom", 1997); 
@@ -85,7 +97,9 @@ public class BookServiceTests
     public void DeleteBook_ShouldDeleteBook()
     {
         //Arrange
-        BookService bookservice = new BookService(NullLogger<BookService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookservice = new BookService(context, NullLogger<BookService>.Instance);
         
         //Act
         bookservice.AddBook("Harry Potter", "Tom", 1997); 
@@ -99,7 +113,9 @@ public class BookServiceTests
     public void DeleteBook_ShouldReturnFalse_WhenBookDoesNotExist()
     {
         //Arrange
-        BookService bookservice = new BookService(NullLogger<BookService>.Instance);
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        using var context = new LibraryDbContext(options);
+        BookService bookservice = new BookService(context, NullLogger<BookService>.Instance);
         
         //Act
         bookservice.AddBook("Harry Potter", "Tom", 1997); 
