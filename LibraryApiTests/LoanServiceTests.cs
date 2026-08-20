@@ -1,5 +1,5 @@
-using LibraryApi.Models;
 using LibraryApi.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LibraryApiTests;
 
@@ -9,9 +9,9 @@ public class LoanServiceTests
     public void AddLoan_ShouldAddLoan()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -24,47 +24,47 @@ public class LoanServiceTests
         Assert.Equal(1, result[0].MemberId);
         Assert.Equal(1, result[0].BookId);
         Assert.Equal(1, result[0].LoanId); 
-        Assert.True(result1);
+        Assert.NotNull(result1);
     }
     [Fact]
-    public void AddLoan_ShouldReturnFalse_WhenBookDoesNotExist()
+    public void AddLoan_ShouldReturnNull_WhenBookDoesNotExist()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance); 
 
         //Act
         memberService.AddMember("Tim", "tim@gmail.com");
         var result = loanService.AddLoan(1, 1);
         
         //Assert
-        Assert.False(result);
+        Assert.Null(result);
         Assert.Empty(loanService.GetLoans());
     }
     [Fact]
-    public void AddLoan_ShouldReturnFalse_WhenMemberDoesNotExist()
+    public void AddLoan_ShouldReturnNull_WhenMemberDoesNotExist()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
         var result = loanService.AddLoan(1, 1);
         
         //Assert
-        Assert.False(result);
+        Assert.Null(result);
         Assert.Empty(loanService.GetLoans());
     }
     [Fact]
-    public void AddLoan_ShouldReturnFalse_WhenBookIsNotAvailable()
+    public void AddLoan_ShouldReturnNull_WhenBookIsNotAvailable()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -74,7 +74,7 @@ public class LoanServiceTests
         var result = loanService.AddLoan(1, 1);
         
         //Assert
-        Assert.False(result);
+        Assert.Null(result);
         Assert.NotNull(book);
         Assert.False(book.IsAvailable);
     }
@@ -82,9 +82,9 @@ public class LoanServiceTests
     public void AddLoan_ShouldMakeBookUnavailable()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -100,9 +100,9 @@ public class LoanServiceTests
     public void ReturnBook_ShouldReturnBook()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -124,9 +124,9 @@ public class LoanServiceTests
     public void ReturnBook_ShouldReturnFalse_WhenLoanDoesNotExist()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         var result = loanService.ReturnBook(2);
@@ -138,9 +138,9 @@ public class LoanServiceTests
     public void ReturnBook_ShouldReturnFalse_WhenLoanAlreadyReturned()
     {
         //Arrange
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -155,9 +155,9 @@ public class LoanServiceTests
     [Fact]
     public void GetLoanById_ShouldReturnLoan()
     {
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -174,9 +174,9 @@ public class LoanServiceTests
     [Fact]
     public void GetLoanById_ShouldReturnNull_WhenLoanDoesNotExist()
     {
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);
@@ -191,9 +191,9 @@ public class LoanServiceTests
     [Fact]
     public void GetLoans_ShouldReturnAllLoans()
     {
-        BookService bookService = new BookService();
-        MemberService memberService = new MemberService();
-        LoanService loanService = new LoanService(memberService, bookService);
+        BookService bookService = new BookService(NullLogger<BookService>.Instance);
+        MemberService memberService = new MemberService(NullLogger<MemberService>.Instance);
+        LoanService loanService = new LoanService(memberService, bookService, NullLogger<LoanService>.Instance);
 
         //Act
         bookService.AddBook("UML", "Peter", 2000);

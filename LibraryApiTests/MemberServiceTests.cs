@@ -1,4 +1,5 @@
 using LibraryApi.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LibraryApiTests;
 
@@ -8,34 +9,34 @@ public class MemberServiceTests
     public void AddMember_ShouldAddMember()
     {
         //Arrange
-        MemberService memberservice = new ();
+        MemberService memberservice = new (NullLogger<MemberService>.Instance);
 
         //Act
         var result = memberservice.AddMember("Peter", "peter@gmail.com");
         var member = memberservice.GetMembers();
         
         //Assert
-        Assert.True(result);
+        Assert.NotNull(result);
         Assert.Equal("Peter", member[0].Name);
     }
     [Fact]
-    public void AddMember_ShouldReturnFalse_WhenEmailAlreadyExists()
+    public void AddMember_ShouldReturnNull_WhenEmailAlreadyExists()
     {
         //Arrange
-        MemberService memberservice = new ();
+        MemberService memberservice = new (NullLogger<MemberService>.Instance);
 
         //Act
         memberservice.AddMember("Peter", "peter@gmail.com");
         var result = memberservice.AddMember("Peter", "peter@gmail.com");
         
         //Assert
-        Assert.False(result);
+        Assert.Null(result);
     }
     [Fact]
     public void GetMembers_ShouldReturnAllMembers()
     {
         //Arrange
-        MemberService memberservice = new ();
+        MemberService memberservice = new (NullLogger<MemberService>.Instance);
 
         //Act
         memberservice.AddMember("Peter", "peter@gmail.com");
@@ -50,7 +51,7 @@ public class MemberServiceTests
     public void GetMemberById_ShouldReturnMember()
     {
         //Arrange
-        MemberService memberservice = new ();
+        MemberService memberservice = new (NullLogger<MemberService>.Instance);
 
         //Act
         memberservice.AddMember("Peter", "peter@gmail.com");
@@ -65,7 +66,7 @@ public class MemberServiceTests
     public void GetMemberById_ShouldReturnNull_WhenMemberDoesNotExist()
     {
         //Arrange
-        MemberService memberservice = new ();
+        MemberService memberservice = new (NullLogger<MemberService>.Instance);
 
         //Act
         memberservice.AddMember("Peter", "peter@gmail.com");
@@ -78,7 +79,7 @@ public class MemberServiceTests
     public void DeleteMember_ShouldDeleteMember()
     {
         //Arrange
-        MemberService memberservice = new ();
+        MemberService memberservice = new (NullLogger<MemberService>.Instance);
 
         //Act
         memberservice.AddMember("Peter", "peter@gmail.com");
@@ -91,7 +92,7 @@ public class MemberServiceTests
     public void DeleteMember_ShouldReturnFalse_WhenMemberDoesNotExist()
     {
         //Arrange
-        MemberService memberservice = new ();
+        MemberService memberservice = new (NullLogger<MemberService>.Instance);
 
         //Act
         memberservice.AddMember("Peter", "peter@gmail.com");
