@@ -14,14 +14,14 @@ builder.Services.AddSingleton<ILoanService, LoanService>();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 

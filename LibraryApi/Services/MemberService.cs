@@ -27,7 +27,7 @@ public class MemberService: IMemberService
     {
         if (_members.Any(x => x.Email == email))
         {
-            _logger.LogWarning("A member with the Email {Email} is already exist.", email);
+            _logger.LogWarning("A member with the Email {Email} already exists.", email);
             return null;
         }
         

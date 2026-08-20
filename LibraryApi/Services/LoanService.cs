@@ -25,7 +25,7 @@ public class LoanService : ILoanService
         
         if (member is null || book is null || !book.IsAvailable)
         {
-            _logger.LogWarning("Loan could not be created. Member with id {memberId} or book with {bookId} is unvalid, or book is unavailable.", memberId, bookId);
+            _logger.LogWarning("Loan could not be created. Member with id {MemberId} or book with {BookId} is invalid, or book is unavailable.", memberId, bookId);
             return null;
         }
         
@@ -51,7 +51,7 @@ public class LoanService : ILoanService
 
         if (loan is null || loan.ReturnDate is not null)
         {
-            _logger.LogWarning("Loan with Id {id} is not found or has already been returned.", id);
+            _logger.LogWarning("Loan with id {LoanId} was not found or has already been returned.", id);
             return false;
         }
         
