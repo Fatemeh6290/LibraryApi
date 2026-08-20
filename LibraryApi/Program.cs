@@ -1,4 +1,5 @@
 ﻿using LibraryApi.Interfaces;
+using LibraryApi.Middleware;
 using LibraryApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,8 @@ app.UseAuthorization();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 
