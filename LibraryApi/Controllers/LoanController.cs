@@ -11,7 +11,6 @@ namespace LibraryApi.Controllers;
 public class LoanController : ControllerBase
 {
     private readonly ILoanService _loanService;
-
     public LoanController(ILoanService loanService)
     {
         _loanService = loanService;
