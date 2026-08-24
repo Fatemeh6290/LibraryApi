@@ -8,7 +8,6 @@ public class BookService: IBookService
 {
     private readonly LibraryDbContext _context;
     private readonly ILogger<BookService> _logger;
-    private int _bookId = 1;
 
     public BookService(LibraryDbContext context, ILogger<BookService> logger)
     {
@@ -36,7 +35,6 @@ public class BookService: IBookService
         
         var book = new Book
         {
-            BookId = _bookId++,
             Title = title,
             Author = author,
             PublishedYear = publishedYear,

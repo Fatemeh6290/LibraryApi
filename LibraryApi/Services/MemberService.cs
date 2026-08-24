@@ -8,7 +8,6 @@ public class MemberService: IMemberService
 {
     private readonly LibraryDbContext _context;
     private readonly ILogger<MemberService> _logger;
-    private int _memberId = 1;
 
     public MemberService(LibraryDbContext context, ILogger<MemberService> logger)
     {
@@ -35,7 +34,6 @@ public class MemberService: IMemberService
         
         var member = new Member
         {
-            MemberId = _memberId++,
             Name = name,
             Email = email,
         };

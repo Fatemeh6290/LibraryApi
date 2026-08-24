@@ -69,9 +69,4 @@ public class BookController : ControllerBase
             new { id = book.BookId },
             result);
     }
-    [HttpGet("test-error")]
-    public IActionResult TestError()
-    {
-        throw new Exception("Test exception");
-    }
 }

@@ -10,13 +10,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<ILoanService, LoanService>();
+
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddSingleton<IBookService, BookService>();
-builder.Services.AddSingleton<IMemberService, MemberService>();
-builder.Services.AddSingleton<ILoanService, LoanService>();
 
 var app = builder.Build();
 
@@ -32,3 +32,7 @@ app.UseSwaggerUI();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program
+{
+}
