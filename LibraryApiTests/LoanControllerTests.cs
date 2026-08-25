@@ -247,7 +247,7 @@ public class LoanControllerTests : IClassFixture<CustomWebApplicationFactory>
     }
     
     [Fact]
-    public async Task ReturnLoan_ShouldReturnSuccess()
+    public async Task ReturnLoan_ShouldReturnNoContent()
     {
         //Arrange
         var requestBook = new CreateBookDto
@@ -298,7 +298,51 @@ public class LoanControllerTests : IClassFixture<CustomWebApplicationFactory>
     }
     
     [Fact]
-    public async Task ReturnLoan_ShouldReturnBadRequest_WhenAlreadyReturned()
+    public async Task ReturnLoan_ShouldReturnNotFound_WhenAlreadyReturned()
+    {
+        // Arrange
+        var bookRequest = new CreateBookDto
+        {
+            Title = "Test DB",
+            Author = "Robert Martin",
+            PublishedYear = 2008
+        };
+
+        var bookResponse = await _client.PostAsJsonAsync("/api/book", bookRequest);
+        var book = await bookResponse.Content.ReadFromJsonAsync<BookDto>();
+
+        var memberRequest = new CreateMemberDto
+        {
+            Name = "Maximilian Martin",
+            Email = "maximilian@example.com"
+        };
+
+        var memberResponse = await _client.PostAsJsonAsync("/api/member", memberRequest);
+        var member = await memberResponse.Content.ReadFromJsonAsync<MemberDto>();
+
+        var loanRequest = new CreateLoanDto
+        {
+            BookId = book!.BookId,
+            MemberId = member!.MemberId
+        };
+
+        var loanResponse = await _client.PostAsJsonAsync("/api/loan", loanRequest);
+        Assert.Equal(HttpStatusCode.Created, loanResponse.StatusCode);
+
+        var loan = await loanResponse.Content.ReadFromJsonAsync<LoanDto>();
+
+        // Act
+        var firstReturn = await _client.DeleteAsync($"/api/loan/{loan!.LoanId}");
+
+        var secondReturn = await _client.DeleteAsync($"/api/loan/{loan.LoanId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NoContent, firstReturn.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, secondReturn.StatusCode);
+    }
+    
+    [Fact]
+    public async Task ReturnLoan_ShouldSetReturnDate()
     {
         // Arrange
         var bookRequest = new CreateBookDto
@@ -332,12 +376,60 @@ public class LoanControllerTests : IClassFixture<CustomWebApplicationFactory>
         var loan = await loanResponse.Content.ReadFromJsonAsync<LoanDto>();
 
         // Act
-        var firstReturn = await _client.DeleteAsync($"/api/loan/{loan!.LoanId}");
-
-        var secondReturn = await _client.DeleteAsync($"/api/loan/{loan.LoanId}");
-
+        var returnBook = await _client.DeleteAsync($"/api/loan/{loan!.LoanId}");
+        
+        var response = await _client.GetAsync($"/api/loan/{loan.LoanId}");
+        var returnedLoan = await response.Content.ReadFromJsonAsync<LoanDto>();
+        
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, firstReturn.StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, secondReturn.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, returnBook.StatusCode);
+        Assert.NotNull(returnedLoan);
+        Assert.NotNull(returnedLoan.ReturnDate);
+    }
+    
+    [Fact]
+    public async Task ReturnLoan_ShouldMakeBookAvailable()
+    {
+        // Arrange
+        var bookRequest = new CreateBookDto
+        {
+            Title = "Testing & Testing",
+            Author = "Robert Martin",
+            PublishedYear = 2008
+        };
+
+        var bookResponse = await _client.PostAsJsonAsync("/api/book", bookRequest);
+        var book = await bookResponse.Content.ReadFromJsonAsync<BookDto>();
+
+        var memberRequest = new CreateMemberDto
+        {
+            Name = "Sandra Martin",
+            Email = "sandra@example.com"
+        };
+
+        var memberResponse = await _client.PostAsJsonAsync("/api/member", memberRequest);
+        var member = await memberResponse.Content.ReadFromJsonAsync<MemberDto>();
+
+        var loanRequest = new CreateLoanDto
+        {
+            BookId = book!.BookId,
+            MemberId = member!.MemberId
+        };
+
+        var loanResponse = await _client.PostAsJsonAsync("/api/loan", loanRequest);
+        Assert.Equal(HttpStatusCode.Created, loanResponse.StatusCode);
+
+        var loan = await loanResponse.Content.ReadFromJsonAsync<LoanDto>();
+        var returnResponse = await _client.DeleteAsync($"/api/loan/{loan!.LoanId}");
+        
+        // Act
+        Assert.Equal(HttpStatusCode.NoContent, returnResponse.StatusCode);
+        
+        var response = await _client.GetAsync($"/api/book/{book.BookId}");
+        var returnBook = await response.Content.ReadFromJsonAsync<BookDto>();
+        
+        // Assert
+        Assert.NotNull(returnBook);
+        Assert.True(returnBook.IsAvailable);
     }
 }

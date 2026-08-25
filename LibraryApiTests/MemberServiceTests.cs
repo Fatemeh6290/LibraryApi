@@ -7,115 +7,117 @@ namespace LibraryApiTests;
 
 public class MemberServiceTests
 {
+    private readonly LibraryDbContext _context;
+    private readonly MemberService _memberService;
+    public MemberServiceTests()
+    {
+        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+        _context = new LibraryDbContext(options);
+        _memberService = new (_context, NullLogger<MemberService>.Instance);
+    }
+    
     [Fact]
     public void AddMember_ShouldAddMember()
     {
-        //Arrange
-        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        using var context = new LibraryDbContext(options);
-        MemberService memberservice = new (context, NullLogger<MemberService>.Instance);
-
         //Act
-        var result = memberservice.AddMember("Peter", "peter@gmail.com");
-        var member = memberservice.GetMembers();
-        
-        //Assert
-        Assert.NotNull(result);
-        Assert.Equal("Peter", member[0].Name);
-    }
-    [Fact]
-    public void AddMember_ShouldReturnNull_WhenEmailAlreadyExists()
-    {
-        //Arrange
-        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        using var context = new LibraryDbContext(options);
-        MemberService memberservice = new (context, NullLogger<MemberService>.Instance);
-        
-        //Act
-        memberservice.AddMember("Peter", "peter@gmail.com");
-        var result = memberservice.AddMember("Peter", "peter@gmail.com");
-        
-        //Assert
-        Assert.Null(result);
-    }
-    [Fact]
-    public void GetMembers_ShouldReturnAllMembers()
-    {
-        //Arrange
-        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        using var context = new LibraryDbContext(options);
-        MemberService memberservice = new (context, NullLogger<MemberService>.Instance);
-        
-        //Act
-        memberservice.AddMember("Peter", "peter@gmail.com");
-        memberservice.AddMember("Tim", "tim@gmail.com");
-        var result = memberservice.GetMembers();
-        
-        //Assert
-        Assert.NotEmpty(result);
-        Assert.Equal(2, result.Count);
-    }
-    [Fact]
-    public void GetMemberById_ShouldReturnMember()
-    {
-        //Arrange
-        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        using var context = new LibraryDbContext(options);
-        MemberService memberservice = new (context, NullLogger<MemberService>.Instance);
-        
-        //Act
-        memberservice.AddMember("Peter", "peter@gmail.com");
-        var result = memberservice.GetMemberById(1);
+        var result = _memberService.AddMember("Peter", "peter@gmail.com");
         
         //Assert
         Assert.NotNull(result);
         Assert.Equal("Peter", result.Name);
         Assert.Equal("peter@gmail.com", result.Email);
     }
+    
     [Fact]
-    public void GetMemberById_ShouldReturnNull_WhenMemberDoesNotExist()
+    public void AddMember_ShouldReturnNull_WhenEmailAlreadyExists()
     {
         //Arrange
-        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        using var context = new LibraryDbContext(options);
-        MemberService memberservice = new (context, NullLogger<MemberService>.Instance);
+        _memberService.AddMember("Peter", "peter@gmail.com");
         
         //Act
-        memberservice.AddMember("Peter", "peter@gmail.com");
-        var result = memberservice.GetMemberById(2);
+        var result = _memberService.AddMember("Peter", "peter@gmail.com");
         
         //Assert
         Assert.Null(result);
     }
+    
+    [Fact]
+    public void GetMembers_ShouldReturnAllMembers()
+    {
+        //Arrange
+        _memberService.AddMember("Peter", "peter@gmail.com");
+        _memberService.AddMember("Tim", "tim@gmail.com");
+        
+        //Act
+        var result = _memberService.GetMembers();
+        
+        //Assert
+        Assert.Equal(2, result.Count);
+    }
+    
+    [Fact]
+    public void GetMemberById_ShouldReturnMember()
+    {
+        //Arrange
+        _memberService.AddMember("Peter", "peter@gmail.com");
+        
+        //Act
+        var result = _memberService.GetMemberById(1);
+        
+        //Assert
+        Assert.NotNull(result);
+        Assert.Equal("Peter", result.Name);
+        Assert.Equal("peter@gmail.com", result.Email);
+    }
+    
+    [Fact]
+    public void GetMemberById_ShouldReturnNull_WhenMemberDoesNotExist()
+    {
+        //Arrange
+        _memberService.AddMember("Peter", "peter@gmail.com");
+        
+        //Act
+        var result = _memberService.GetMemberById(2);
+        
+        //Assert
+        Assert.Null(result);
+    }
+    
     [Fact]
     public void DeleteMember_ShouldDeleteMember()
     {
         //Arrange
-        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        using var context = new LibraryDbContext(options);
-        MemberService memberservice = new (context, NullLogger<MemberService>.Instance);
+        _memberService.AddMember("Peter", "peter@gmail.com");
         
         //Act
-        memberservice.AddMember("Peter", "peter@gmail.com");
-        var result = memberservice.DeleteMember(1);
+        var result = _memberService.DeleteMember(1);
         
         //Assert
         Assert.True(result);
+        Assert.Null(_memberService.GetMemberById(1));
     }
+    
     [Fact]
     public void DeleteMember_ShouldReturnFalse_WhenMemberDoesNotExist()
     {
         //Arrange
-        var options = new DbContextOptionsBuilder<LibraryDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        using var context = new LibraryDbContext(options);
-        MemberService memberservice = new (context, NullLogger<MemberService>.Instance);
+        _memberService.AddMember("Peter", "peter@gmail.com");
         
         //Act
-        memberservice.AddMember("Peter", "peter@gmail.com");
-        var result = memberservice.DeleteMember(2);
+        var result = _memberService.DeleteMember(2);
         
         //Assert
         Assert.False(result);
-        Assert.NotNull(memberservice.GetMemberById(1));
+        Assert.NotNull(_memberService.GetMemberById(1));
+    }
+    
+    [Fact]
+    public void GetMembers_ShouldReturnEmpty_WhenNoMembersExist()
+    {
+        // Act
+        var result = _memberService.GetMembers();
+
+        // Assert
+        Assert.Empty(result);
     }
 }
