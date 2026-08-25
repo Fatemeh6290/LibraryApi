@@ -10,7 +10,6 @@ public class LoanService : ILoanService
     private readonly IBookService _bookService;
     private readonly LibraryDbContext _context;
     private readonly ILogger<LoanService> _logger;
-    private int _loanId = 1;
 
     public LoanService(LibraryDbContext context, IMemberService memberService, IBookService bookService, ILogger<LoanService> logger)
     {
@@ -33,7 +32,6 @@ public class LoanService : ILoanService
         
         var loan = new Loan
         {
-            LoanId = _loanId++,
             BookId = bookId,
             MemberId = memberId,
             LoanDate = DateTime.Now,
@@ -69,6 +67,7 @@ public class LoanService : ILoanService
         
         loan.ReturnDate = DateTime.Now;
         book.IsAvailable = true;
+        _context.SaveChanges();
         _logger.LogInformation("Book for loan with id {id} was returned successfully.", id);
         
         return true;
