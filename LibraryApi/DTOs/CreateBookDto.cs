@@ -5,10 +5,10 @@ namespace LibraryApi.DTOs;
 public class CreateBookDto
 {
     [Required] 
-    public string Title { get; set; } = string.Empty;
+    public string? Title { get; set; }
     
     [Required]
-    public string Author { get; set; } = string.Empty;
+    public string? Author { get; set; }
     
     [Required]
     [Range(1990, 2026)]
