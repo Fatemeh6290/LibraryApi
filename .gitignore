@@ -1,5 +1,9 @@
 .idea/
 .sln.Dotsettings.user
 *.user
+*.SQLite
+*.db
+*.db-shm
+*.db-wal
 bin/
 obj/
